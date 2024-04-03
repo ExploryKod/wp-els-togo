@@ -27,7 +27,7 @@ function filtrer_projets() {
         'posts_per_page' => -1,
     );
 
-    // Filtrer par catégorie
+    // Filtrer par catégorie si elle est définie
     if (isset($_POST['categorie'])) {
         $args['tax_query'][] = array(
             'taxonomy' => 'categorie-du-projet',
@@ -36,14 +36,14 @@ function filtrer_projets() {
         );
     }
 
-
+    // Exécuter la requête pour récupérer les projets
     $query = new WP_Query($args);
 
-    ob_start(); // Commence la mise en mémoire tampon de sortie
+    ob_start(); // Commencer la mise en mémoire tampon de sortie
 
     if ($query->have_posts()) :
         while ($query->have_posts()) : $query->the_post();
-            // Affichez ici les informations de votre projet
+            // Afficher les informations de chaque projet
             ?>
             <div class="project">
                 <h2><?php the_title(); ?></h2>
@@ -56,14 +56,12 @@ function filtrer_projets() {
         wp_reset_postdata();
     else :
         // Aucun projet trouvé
-        echo '<h2>Aucun projet trouvé dans la catégorie' . $_POST['categorie'] .'</h2>';
+        echo '<h2>Aucun projet trouvé.</h2>';
     endif;
 
-    $output = ob_get_clean(); // Récupère le contenu du tampon et efface le tampon
-
-    // Retourne le HTML des projets filtrés
+    $output = ob_get_clean(); // Récupérer le contenu du tampon et vider le tampon
     echo $output;
-
     // Assurez-vous d'arrêter l'exécution de WordPress après la sortie
     wp_die();
 }
+

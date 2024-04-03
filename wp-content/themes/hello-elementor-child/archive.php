@@ -3,6 +3,7 @@
 /*
 Template Name: Archive Nos Projets
 */
+
 ?>
 <style>
     .container {
@@ -83,14 +84,30 @@ Template Name: Archive Nos Projets
             <div class="projects-grid" id="projets-container">
                 <!-- Contenu des projets sera affiché ici -->
                 <?php
-                // Inclure le contenu des projets filtrés
-                if (isset($output)) {
-                    echo $output;
-                } else {
-                    // Afficher un message par défaut si aucun projet n'est trouvé
+                // WP Query to fetch all projects initially
+                $args = array(
+                    'post_type' => 'votre-projet',
+                    'posts_per_page' => -1,
+                );
+                $query = new WP_Query($args);
+                if ($query->have_posts()) :
+                    while ($query->have_posts()) : $query->the_post();
+                        ?>
+                        <div class="project">
+                            <h2><?php the_title(); ?></h2>
+                            <div class="project-content">
+                                <?php the_content(); ?>
+                            </div>
+                        </div>
+                    <?php
+                    endwhile;
+                    wp_reset_postdata();
+                else :
+                    // Aucun projet trouvé
                     echo '<p>Aucun projet trouvé.</p>';
-                }
+                endif;
                 ?>
+
             </div>
         </div>
     </div>
