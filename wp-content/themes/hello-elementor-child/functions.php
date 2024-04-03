@@ -28,11 +28,20 @@ function filtrer_projets() {
     );
 
     // Filtrer par catégorie si elle est définie
+//    if (isset($_POST['categorie'])) {
+//        $args['tax_query'][] = array(
+//            'taxonomy' => 'categorie-du-projet',
+//            'field'    => 'slug',
+//            'terms'    => $_POST['categorie'],
+//        );
+//    }
+
+    // Filtrer par catégorie si elle est définie
     if (isset($_POST['categorie'])) {
-        $args['tax_query'][] = array(
-            'taxonomy' => 'categorie-du-projet',
-            'field'    => 'slug',
-            'terms'    => $_POST['categorie'],
+        $args['meta_query'][] = array(
+            'key' => 'categorie', // Remplacez 'nom_de_votre_champ_acf' par le nom de votre champ ACF
+            'value' => $_POST['categorie'],
+            'compare' => '=',
         );
     }
 
