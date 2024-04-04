@@ -28,15 +28,6 @@ function filtrer_projets() {
     );
 
     // Filtrer par catégorie si elle est définie
-//    if (isset($_POST['categorie'])) {
-//        $args['tax_query'][] = array(
-//            'taxonomy' => 'categorie-du-projet',
-//            'field'    => 'slug',
-//            'terms'    => $_POST['categorie'],
-//        );
-//    }
-
-    // Filtrer par catégorie si elle est définie
     if (isset($_POST['categorie'])) {
         $args['meta_query'][] = array(
             'key' => 'categorie', // Remplacez 'nom_de_votre_champ_acf' par le nom de votre champ ACF
@@ -45,6 +36,25 @@ function filtrer_projets() {
         );
     }
 
+    if (isset($_POST['domain'])) {
+        $args['meta_query'][] = array(
+            'key' => 'domain', // Remplacez 'nom_de_votre_champ_acf' par le nom de votre champ ACF
+            'value' => $_POST['domain'],
+            'compare' => '=',
+        );
+    }
+
+    if (isset($_POST['start_date']) && isset($_POST['end_date'])) {
+        $start_date = DateTime::createFromFormat('Y-m-d', $_POST['start_date'])->format('Ymd');
+        $end_date = DateTime::createFromFormat('Y-m-d', $_POST['end_date'])->format('Ymd');
+
+        $args['meta_query'][] = array(
+            'key' => 'date_du_projet',
+            'value' => array($start_date, $end_date),
+            'compare' => 'BETWEEN',
+            'type' => 'DATE',
+        );
+    }
     // Exécuter la requête pour récupérer les projets
     $query = new WP_Query($args);
 
