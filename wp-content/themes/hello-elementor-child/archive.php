@@ -166,27 +166,21 @@ Template Name: Archive Nos Projets
 <div id="modalFiltres" style="display: none;">
     <button id="fermerModalFiltres">Fermer</button>
     <ul>
-        <li><a href="#" class="filter"  data-categorie="hygiene">Hygiène</a></li>
-        <li><a href="#" class="filter"  data-categorie="developpement">Développement économique</a></li>
+        <li><a href="#" class="filter" data-order="ASC" data-categorie="hygiene">Hygiène</a></li>
+        <li><a href="#" class="filter"  data-order="ASC" data-categorie="developpement">Développement économique</a></li>
         <!-- Ajoutez d'autres catégories si nécessaire -->
-        <li><a href="#" class="filter"  data-categorie="sante">Santé</a></li>
-        <li><a href="#" class="filter"  data-categorie="education">Éducation</a></li>
-    </ul>
-    <ul>
-        <li><a href="#" class="filter"  data-domain="hygiene">Hygiène</a></li>
-        <li><a href="#" class="filter"  data-domain="developpement">Développement économique</a></li>
-        <!-- Ajoutez d'autres catégories si nécessaire -->
-        <li><a href="#" class="filter"  data-domain="sante">Santé</a></li>
-        <li><a href="#" class="filter"  data-domain="education">Éducation</a></li>
+        <li><a href="#" class="filter"  data-order="ASC" data-categorie="sante">Santé</a></li>
+        <li><a href="#" class="filter"  data-order="ASC" data-categorie="education">Éducation</a></li>
     </ul>
 
     <div class="filter">
         <label for="date-du-projet-start">Plage de date :</label>
-        <input type="date" name="start-date" class="filter" id="date-du-projet-start" placeholder="Début">
+        <input type="date" name="start-date" class="filter" id="date-du-projet-start" placeholder="Début" value="<?php echo "2024-01-01" ?>">
         <label for="date-du-projet-end">Plage de date :</label>
-        <input type="date" name="end-date" class="filter" id="date-du-projet-end" placeholder="Fin">
+        <input type="date" name="end-date" class="filter" id="date-du-projet-end" placeholder="Fin" value="<?php echo date('Y-m-d'); ?>">
     </div>
-    <button id="filter-button">Filtrer</button>
+    <button class="filter" data-categorie="hygiene" data-order="DSC">Trier par DSC</button>
+    <button class="filter" data-categorie="hygiene" data-order="DSC">Trier par ASC</button>
 
 <!--    <div class="booking-form">-->
 <!--        <div class="form-group">-->
@@ -208,6 +202,7 @@ Template Name: Archive Nos Projets
                 $args = array(
                     'post_type' => 'votre-projet',
                     'posts_per_page' => -1,
+                    'order' => 'ASC'
                 );
                 $query = new WP_Query($args);
                 if ($query->have_posts()) :
@@ -249,35 +244,54 @@ Template Name: Archive Nos Projets
         });
 
         // Filtrer les projets en utilisant Fetch
-
-        // Filtrer les projets en utilisant Fetch
         document.querySelectorAll("#modalFiltres .filter").forEach(function(link) {
             link.addEventListener("click", function(e) {
                 e.preventDefault();
-                let categorie = this.dataset.categorie;
-                let domaine = this.dataset.domaine;
-                let start_date = document.getElementById("date-du-projet-start").value;
-                let end_date = document.getElementById("date-du-projet-end").value;
 
-                fetch("<?php echo admin_url('admin-ajax.php'); ?>", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: new URLSearchParams({
-                        action: "filtrer_projets",
-                        categorie: categorie,
-                        domaine: domaine,
-                        start_date: start_date, // Pass start date to PHP
-                        end_date: end_date // Pass end date to PHP
-                    })
-                })
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById("projets-container").innerHTML = data;
-                    });
+                // Get the value of the clicked filter
+                const categorie = this.dataset.categorie;
+                const order = this.dataset.order;
+
+                // Get the values of the date inputs
+                // const start_date = document.getElementById("date-du-projet-start").value;
+                // const end_date = document.getElementById("date-du-projet-end").value;
+
+                // Call the function to filter projects
+                filterProjects(categorie, order);
             });
         });
+
+        // // Event listener for date inputs
+        // document.querySelectorAll(".filter").forEach(function(input) {
+        //     input.addEventListener("change", function(e) {
+        //
+        //         // Get the values of the date inputs
+        //         const start_date = document.getElementById("date-du-projet-start").value;
+        //         const end_date = document.getElementById("date-du-projet-end").value;
+        //
+        //         // Call the function to filter projects
+        //         filterProjects(categorie, order, start_date, end_date);
+        //     });
+        // });
+
+        function filterProjects(categorie, order) {
+            fetch("<?php echo admin_url('admin-ajax.php'); ?>", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    action: "filtrer_projets",
+                    categorie: categorie,
+                    order: order,
+                })
+            })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("projets-container").innerHTML = data;
+                });
+        }
+
     });
 </script>
 

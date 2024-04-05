@@ -22,10 +22,24 @@ add_action('wp_ajax_filtrer_projets', 'filtrer_projets');
 add_action('wp_ajax_nopriv_filtrer_projets', 'filtrer_projets');
 
 function filtrer_projets() {
-    $args = array(
-        'post_type' => 'votre-projet',
-        'posts_per_page' => -1,
-    );
+
+    // Filtrer par catégorie si elle est définie
+    if (isset($_POST['order'])) {
+        $args = array(
+            'post_type' => 'votre-projet',
+            'posts_per_page' => -1,
+            'order' => $_POST['order']
+        );
+    } else {
+        $args = array(
+            'post_type' => 'votre-projet',
+            'posts_per_page' => -1,
+            'order' => 'ASC'
+        );
+    }
+
+
+
 
     // Filtrer par catégorie si elle est définie
     if (isset($_POST['categorie'])) {
@@ -36,25 +50,22 @@ function filtrer_projets() {
         );
     }
 
-    if (isset($_POST['domain'])) {
-        $args['meta_query'][] = array(
-            'key' => 'domain', // Remplacez 'nom_de_votre_champ_acf' par le nom de votre champ ACF
-            'value' => $_POST['domain'],
-            'compare' => '=',
-        );
-    }
+//    try {
+//        if (isset($_POST['start_date']) && isset($_POST['end_date'])) {
+//
+//            $start_date = $_POST['start_date'];
+//            $end_date = $_POST['end_date'];
+//            $args['meta_query'][] = array(
+//                'key' => 'date_du_projet',
+//                'value' => array($start_date, $end_date),
+//                'compare' => 'BETWEEN',
+//                'type' => 'DATE',
+//            );
+//        }
+//    } catch(Exception $e) {
+//        Throw new Exception($e->getMessage());
+//    }
 
-    if (isset($_POST['start_date']) && isset($_POST['end_date'])) {
-        $start_date = DateTime::createFromFormat('Y-m-d', $_POST['start_date'])->format('Ymd');
-        $end_date = DateTime::createFromFormat('Y-m-d', $_POST['end_date'])->format('Ymd');
-
-        $args['meta_query'][] = array(
-            'key' => 'date_du_projet',
-            'value' => array($start_date, $end_date),
-            'compare' => 'BETWEEN',
-            'type' => 'DATE',
-        );
-    }
     // Exécuter la requête pour récupérer les projets
     $query = new WP_Query($args);
 
